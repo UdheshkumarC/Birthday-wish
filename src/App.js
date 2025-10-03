@@ -67,7 +67,7 @@ const VideoSection = () => (
             <div className="mt-12 w-full aspect-w-16 aspect-h-9 reveal">
                 <iframe 
                     className="w-full h-[500px] rounded-2xl shadow-2xl" 
-                    src="https://www.youtube.com/embed/8f5nO5T-pYI?autoplay=0&mute=1&loop=1&playlist=8f5nO5T-pYI" 
+                    src="/videos/wish.mp4" 
                     title="YouTube video player" 
                     frameBorder="0" 
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
@@ -131,9 +131,9 @@ const SuriyaSection = () => {
 const HobbiesSection = () => {
     const hobbies = [
         { name: 'Amazing Food', videoSrc: '/videos/food.mp4', delay: '0ms' },
-        { name: 'Travelling', videoSrc: '/videos/adventure.mp4', delay: '200ms' },
-        { name: 'Bungee Jumping', videoSrc: '/videos/bungee.mp4', delay: '400ms' },
-        { name: 'Bharatanatyam', videoSrc: '/videos/bharatham.mp4', delay: '600ms' }
+        { name: 'Travelling', videoSrc: '/videos/adventure.mp4', delay: '100ms' },
+        { name: 'Bungee Jumping', videoSrc: '/videos/bungee.mp4', delay: '150ms' },
+        { name: 'Bharatanatyam', videoSrc: '/videos/bharatham.mp4', delay: '200ms' }
     ];
 
     return (
