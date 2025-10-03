@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
 // Component to inject global styles and fonts
 const GlobalStyles = () => {
@@ -57,28 +57,49 @@ const HeroSection = () => (
     </section>
 );
 
-// New Video Section
-const VideoSection = () => (
-    <section className="py-16 md:py-24 px-4 bg-gradient-to-br from-rose-100 via-pink-100 to-purple-100">
-        <div className="max-w-4xl mx-auto text-center">
-            <h2 className="font-fancy text-4xl md:text-5xl text-purple-800 font-bold reveal">
-                A Special Video For You
-            </h2>
-            <div className="mt-12 w-full aspect-w-16 aspect-h-9 reveal">
-                <iframe 
-                    className="w-full h-[500px] rounded-2xl shadow-2xl" 
-                    src="/videos/wish.mp4" 
-                    title="YouTube video player" 
-                    frameBorder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowFullScreen
-                />
-            </div>
-        </div>
-    </section>
-);
+// New Video Section (optimized)
+const VideoSection = () => {
+    const videoRef = useRef(null);
 
-// Favourite Hero Section with Vertical Slideshow
+    useEffect(() => {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && videoRef.current) {
+                    videoRef.current.play();
+                }
+            });
+        }, { threshold: 0.5 });
+
+        if (videoRef.current) observer.observe(videoRef.current);
+
+        return () => {
+            if (videoRef.current) observer.unobserve(videoRef.current);
+        };
+    }, []);
+
+    return (
+        <section className="py-16 md:py-24 px-4 bg-gradient-to-br from-rose-100 via-pink-100 to-purple-100">
+            <div className="max-w-4xl mx-auto text-center">
+                <h2 className="font-fancy text-4xl md:text-5xl text-purple-800 font-bold reveal">
+                    A Special Video For You
+                </h2>
+                <div className="mt-12 w-full aspect-w-16 aspect-h-9 reveal">
+                    <video
+                        ref={videoRef}
+                        src="/videos/wish.mp4"
+                        muted
+                        loop
+                        playsInline
+                        controls
+                        className="w-full h-[500px] rounded-2xl shadow-2xl object-cover"
+                    />
+                </div>
+            </div>
+        </section>
+    );
+};
+
+// Favourite Hero Section with Vertical Slideshow (lazy load images)
 const SuriyaSection = () => {
     const images = [
         "/images/suriya1.jpg",
@@ -111,6 +132,7 @@ const SuriyaSection = () => {
                         <img
                             key={index}
                             src={src}
+                            loading="lazy"
                             alt={`Suriya ${index + 1}`}
                             className={`absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1500 ${
                                 index === currentIndex ? 'opacity-100' : 'opacity-0'
@@ -127,7 +149,7 @@ const SuriyaSection = () => {
     );
 };
 
-// Hobbies Section Component (all panels same size)
+// Hobbies Section Component (lazy load videos)
 const HobbiesSection = () => {
     const hobbies = [
         { name: 'Amazing Food', videoSrc: '/videos/food.mp4', delay: '0ms' },
@@ -135,6 +157,24 @@ const HobbiesSection = () => {
         { name: 'Bungee Jumping', videoSrc: '/videos/bungee.mp4', delay: '150ms' },
         { name: 'Bharatanatyam', videoSrc: '/videos/bharatham.mp4', delay: '200ms' }
     ];
+
+    const videoRefs = useRef([]);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const video = entry.target;
+                if (entry.isIntersecting) video.play();
+                else video.pause();
+            });
+        }, { threshold: 0.5 });
+
+        videoRefs.current.forEach(v => v && observer.observe(v));
+
+        return () => {
+            videoRefs.current.forEach(v => v && observer.unobserve(v));
+        };
+    }, []);
 
     return (
         <section className="py-16 md:py-24 px-4">
@@ -148,14 +188,14 @@ const HobbiesSection = () => {
                 </p>
 
                 <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {hobbies.map(hobby => (
+                    {hobbies.map((hobby, index) => (
                         <div key={hobby.name} className="group reveal" style={{ transitionDelay: hobby.delay }}>
                             <div className="relative overflow-hidden rounded-2xl shadow-xl transition-transform duration-500 transform group-hover:scale-105 w-full h-[320px] md:h-[400px] lg:h-[450px]">
                                 <video
+                                    ref={el => videoRefs.current[index] = el}
                                     src={hobby.videoSrc}
-                                    autoPlay
-                                    loop
                                     muted
+                                    loop
                                     playsInline
                                     className="w-full h-full object-cover"
                                 />
