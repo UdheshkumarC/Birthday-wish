@@ -57,25 +57,9 @@ const HeroSection = () => (
     </section>
 );
 
-// New Video Section (optimized)
+// New Video Section (play on click, user-controlled, no loop)
 const VideoSection = () => {
     const videoRef = useRef(null);
-
-    useEffect(() => {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting && videoRef.current) {
-                    videoRef.current.play();
-                }
-            });
-        }, { threshold: 0.5 });
-
-        if (videoRef.current) observer.observe(videoRef.current);
-
-        return () => {
-            if (videoRef.current) observer.unobserve(videoRef.current);
-        };
-    }, []);
 
     return (
         <section className="py-16 md:py-24 px-4 bg-gradient-to-br from-rose-100 via-pink-100 to-purple-100">
@@ -83,21 +67,22 @@ const VideoSection = () => {
                 <h2 className="font-fancy text-4xl md:text-5xl text-purple-800 font-bold reveal">
                     A Special Video For You
                 </h2>
-                <div className="mt-12 w-full aspect-w-16 aspect-h-9 reveal">
+                <div className="mt-12 w-full aspect-w-16 aspect-h-9 reveal relative">
                     <video
                         ref={videoRef}
                         src="/videos/wish.mp4"
-                        muted
-                        loop
-                        playsInline
-                        controls
                         className="w-full h-[500px] rounded-2xl shadow-2xl object-cover"
+                        controls
+                        loop={false} // Play only once
                     />
+                    {/* Optional: overlay play button can be removed since controls are visible */}
                 </div>
             </div>
         </section>
     );
 };
+
+
 
 // Favourite Hero Section with Vertical Slideshow (lazy load images)
 const SuriyaSection = () => {
